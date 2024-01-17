@@ -1,23 +1,125 @@
-import logo from './logo.svg';
+import { useEffect, useMemo, useState } from 'react';
 import './App.css';
+import { cards } from '@flesh-and-blood/cards';
 
 function App() {
+  const pitchStrings = ['Red', 'Yellow', 'Blue'];
+
+  const heavyHitters = cards.filter(card => card.sets.includes('Heavy Hitters'));
+  const heroes = heavyHitters.filter(card => card.hero && card.young);
+  const weapons = heavyHitters.filter(card => card.types.includes('Weapon'));
+
+  const majestics = heavyHitters.filter(card => card.rarity === 'Majestic');
+  const rares = heavyHitters.filter(card => card.rarity === 'Rare');
+  const commons = heavyHitters.filter(card => card.rarity === 'Common');
+
+  // Assumptions:
+  // - 6 packs
+  // - no token/expansion slots
+  // - 1 majestic
+  // - all common rainbows
+  const numRares = 11; // 12 rare/majestic slots, minus the 1 majestic assumption
+  const numMajestics = 1; // 1 every 4 packs, so assume 1
+  const numCommons = 72; // 11 commons + 1 common rainbow = 12 * 6 packs = 72
+
+  const [selectedHero, setSelectedHero] = useState(null);
+  const [selectedWeapon, setSelectedWeapon] = useState(null);
+  const [selectedSecondWeapon, setSelectedSecondWeapon] = useState(null);
+  const [deckString, setDeckString] = useState(null);
+  const [weaponOptions, setWeaponOptions] = useState([]);
+
+  useEffect(() => {
+    const options = weapons.filter(weapon => intersects(weapon.classes, selectedHero?.classes));
+    setWeaponOptions(options);
+  }, [selectedHero]);
+
+  const changeHero = (event) => {
+    setSelectedHero(heroes.find(hero => hero.name === event.target.value))
+    setSelectedWeapon(null);
+    setSelectedSecondWeapon(null);
+    setDeckString(null);
+    setWeaponOptions([]);
+  }
+
+  // https://stackoverflow.com/a/34890276/1747491
+  const groupBy = function(xs, key) {
+    return xs.reduce(function(rv, x) {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {});
+  };
+
+  const getRandomCard = (cards) => {
+    return cards[Math.floor(Math.random() * cards.length)];
+  }
+
+  const generate = () => {
+    const deck = [];
+    for (let i = 0; i < numRares; i++) deck.push(getRandomCard(rares));
+    for (let i = 0; i < numMajestics; i++) deck.push(getRandomCard(majestics));
+    for (let i = 0; i < numCommons; i++) deck.push(getRandomCard(commons));
+
+    const string = compileDeckString(deck);
+    setDeckString(string);
+  };
+
+  const compileDeckString = (deck) => {
+    if (!selectedHero || !selectedWeapon) return '';
+
+    let selectedWeapons = [selectedWeapon, selectedSecondWeapon].filter(Boolean);
+    
+    let string = 'Deck build - via https://fabdb.net :\n\n';
+    string += `New deck (${selectedHero.name})\n\n`;
+    string += `Weapons: ${selectedWeapons.map(weapon => weapon.name).join(', ')}\n\n`;
+
+    const groupedDeck = groupBy(deck, 'cardIdentifier');
+
+    for(const [cardIdentifier, cards] of Object.entries(groupedDeck)) {
+      const card = cards[0];
+      string += `[${cards.length}] ${card.name}`;
+      
+      if(card.pitch != null) {
+        string += ` (${pitchStrings[card.pitch - 1]})`;
+      };
+
+      string += '\n';
+    }
+
+    return string;
+  }
+
+  const copyDeck = () => {
+    const deck = document.getElementById('deck');
+    deck.select();
+    deck.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+    window.location.href = "https://fabrary.net/decks?tab=import";
+  }
+
+  const intersects = (array1, array2) => {
+    return array1.some(item => array2?.includes(item));
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <select onChange={event => changeHero(event)}>
+        <option disabled selected value>Select hero</option>
+        { heroes.map(hero => <option key={hero.name}>{hero.name}</option>) }
+      </select>
+      <select onChange={event => setSelectedWeapon(weapons.find(weapon => weapon.name === event.target.value))}>
+        <option disabled selected value>Select weapon</option>
+        { weaponOptions.map(weapon => <option key={weapon.name}>{weapon.name}</option>) }
+      </select>
+      { selectedWeapon?.subtypes.includes('1H') &&
+        <select onChange={event => setSelectedSecondWeapon(weapons.find(weapon => weapon.name === event.target.value))}>
+          <option disabled selected value>Select second weapon</option>
+          { weaponOptions.filter(weapon => weapon.subtypes.includes('1H')).map(weapon => <option key={weapon.name}>{weapon.name}</option>) }
+        </select>
+      }
+      <button onClick={generate}>Generate</button>
+      <button onClick={copyDeck}>Copy & Paste</button>
+      <br/>
+      <textarea id="deck" value={deckString} readOnly />
     </div>
   );
 }
