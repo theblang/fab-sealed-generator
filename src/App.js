@@ -13,11 +13,6 @@ function App() {
   const rares = heavyHitters.filter(card => card.rarity === 'Rare');
   const commons = heavyHitters.filter(card => card.rarity === 'Common');
 
-  // Assumptions:
-  // - 6 packs
-  // - no token/expansion slots
-  // - 1 majestic
-  // - all common rainbows
   const numRares = 11; // 12 rare/majestic slots, minus the 1 majestic assumption
   const numMajestics = 1; // 1 every 4 packs, so assume 1
   const numCommons = 72; // 11 commons + 1 common rainbow = 12 * 6 packs = 72
@@ -102,6 +97,15 @@ function App() {
 
   return (
     <div className="App">
+      <div id="assumptions">
+        <span><b>Assumptions</b></span>
+        <ul>
+          <li>6 packs of 16</li>
+          <li>Minus the two token/expansion slots</li>
+          <li>1 majestic</li>
+          <li>All commons in rainbow slot</li>
+        </ul>
+      </div>
       <select onChange={event => changeHero(event)}>
         <option disabled selected value>Select hero</option>
         { heroes.map(hero => <option key={hero.name}>{hero.name}</option>) }

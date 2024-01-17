@@ -1,6 +1,10 @@
 .App {
   text-align: center;
   padding: 20px;
+
+  #assumptions {
+    text-align: left;
+  }
 }
 
 #deck {
