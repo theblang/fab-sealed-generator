@@ -24,6 +24,7 @@ function App() {
     const [selectedHero, setSelectedHero] = useState(null);
     const [selectedWeapon, setSelectedWeapon] = useState(null);
     const [selectedSecondWeapon, setSelectedSecondWeapon] = useState(null);
+    const [weaponIsValid, setWeaponIsValid] = useState(false);
     const [deckString, setDeckString] = useState(null);
     const [weaponOptions, setWeaponOptions] = useState([]);
 
@@ -39,6 +40,7 @@ function App() {
             selectedWeapon?.subtypes.includes("2H") ||
             (selectedWeapon && selectedSecondWeapon)
         ) {
+            setWeaponIsValid(true);
             generate();
         }
     }, [selectedWeapon, selectedSecondWeapon]);
@@ -172,10 +174,11 @@ function App() {
                         ))}
                 </select>
             )}
-            <button onClick={generate}>Generate</button>
-            <button onClick={copyDeck}>Copy & Paste</button>
+            <button onClick={copyDeck}>Export</button>
             <br />
             <textarea id="deck" value={deckString} readOnly />
+            <br />
+            <button onClick={generate} disabled={!weaponIsValid}>Regenerate</button>
         </div>
     );
 }

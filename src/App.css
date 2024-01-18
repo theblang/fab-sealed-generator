@@ -2,17 +2,17 @@
     text-align: center;
     padding: 20px;
 
-    #assumptions {
+    div#assumptions {
         text-align: left;
     }
-}
 
-#deck {
-    width: 500px;
-    height: 500px;
-    margin-top: 20px;
-}
+    textarea#deck {
+        width: 500px;
+        height: 500px;
+        margin: 20px 0 20px 0;
+    }
 
-select:last-of-type {
-    margin-right: 20px;
+    select:last-of-type {
+        margin-right: 20px;
+    }
 }
