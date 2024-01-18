@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import { cards } from "@flesh-and-blood/cards";
+import ExpansionSlotMap from "./ExpansionSlotMap";
 
 function App() {
     const pitchStrings = ["Red", "Yellow", "Blue"];
@@ -9,13 +10,12 @@ function App() {
         card.sets.includes("Heavy Hitters"),
     );
     const heroes = heavyHitters.filter((card) => card.hero && card.young);
-    const weapons = heavyHitters.filter((card) =>
-        card.types.includes("Weapon"),
-    );
+    const weapons = heavyHitters.filter((card) => card.types.includes("Weapon"));
 
-    const majestics = heavyHitters.filter((card) => card.rarity === "Majestic");
-    const rares = heavyHitters.filter((card) => card.rarity === "Rare");
-    const commons = heavyHitters.filter((card) => card.rarity === "Common");
+    const mainPool = heavyHitters.filter((card) => !card.hero && !ExpansionSlotMap["Heavy Hitters"].includes(card.setIdentifiers[0]));
+    const majestics = mainPool.filter((card) => card.rarity === "Majestic");
+    const rares = mainPool.filter((card) => card.rarity === "Rare");
+    const commons = mainPool.filter((card) => card.rarity === "Common");
 
     const numRares = 11; // 12 rare/majestic slots, minus the 1 majestic assumption
     const numMajestics = 1; // 1 every 4 packs, so assume 1
