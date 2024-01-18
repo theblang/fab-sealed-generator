@@ -1,18 +1,18 @@
 .App {
-  text-align: center;
-  padding: 20px;
+    text-align: center;
+    padding: 20px;
 
-  #assumptions {
-    text-align: left;
-  }
+    #assumptions {
+        text-align: left;
+    }
 }
 
 #deck {
-  width: 500px;
-  height: 500px;
-  margin-top: 20px;
+    width: 500px;
+    height: 500px;
+    margin-top: 20px;
 }
 
 select:last-of-type {
-  margin-right: 20px;
+    margin-right: 20px;
 }

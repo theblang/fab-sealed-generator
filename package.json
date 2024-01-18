@@ -40,5 +40,8 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "https://theblang.github.io/fab-sealed-generator"
+  "homepage": "https://theblang.github.io/fab-sealed-generator",
+  "devDependencies": {
+    "prettier": "3.2.4"
+  }
 }
