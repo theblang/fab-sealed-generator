@@ -28,6 +28,12 @@ function App() {
     setWeaponOptions(options);
   }, [selectedHero]);
 
+  useEffect(() => {
+    if(selectedWeapon?.subtypes.includes('2H') || (selectedWeapon && selectedSecondWeapon)) {
+      generate();
+    }
+  }, [selectedWeapon, selectedSecondWeapon]);
+
   const changeHero = (event) => {
     setSelectedHero(heroes.find(hero => hero.name === event.target.value))
     setSelectedWeapon(null);
