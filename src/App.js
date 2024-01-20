@@ -2,20 +2,17 @@ import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import { cards } from "@flesh-and-blood/cards";
 import ExpansionSlotMap from "./ExpansionSlotMap";
+import { Rarity, Release, Subtype, Type } from "@flesh-and-blood/types";
 
 function App() {
-    const pitchStrings = ["Red", "Yellow", "Blue"];
-
-    const heavyHitters = cards.filter((card) =>
-        card.sets.includes("Heavy Hitters"),
-    );
+    const heavyHitters = cards.filter(card => card.sets.includes(Release.HeavyHitters));
     const heroes = heavyHitters.filter((card) => card.hero && card.young);
-    const weapons = heavyHitters.filter((card) => card.types.includes("Weapon"));
+    const weapons = heavyHitters.filter((card) => card.types.includes(Type.Weapon));
 
-    const mainPool = heavyHitters.filter((card) => !card.hero && !ExpansionSlotMap["Heavy Hitters"].includes(card.setIdentifiers[0]));
-    const majestics = mainPool.filter((card) => card.rarity === "Majestic");
-    const rares = mainPool.filter((card) => card.rarity === "Rare");
-    const commons = mainPool.filter((card) => card.rarity === "Common");
+    const mainPool = heavyHitters.filter((card) => !card.hero && !card.rarities.includes(Rarity.Token) && !ExpansionSlotMap[Release.HeavyHitters].includes(card.setIdentifiers[0]));
+    const majestics = mainPool.filter((card) => card.rarity === Rarity.Majestic);
+    const rares = mainPool.filter((card) => card.rarity === Rarity.Rare);
+    const commons = mainPool.filter((card) => card.rarity === Rarity.Common);
 
     const numRares = 11; // 12 rare/majestic slots, minus the 1 majestic assumption
     const numMajestics = 1; // 1 every 4 packs, so assume 1
@@ -37,7 +34,7 @@ function App() {
 
     useEffect(() => {
         if (
-            selectedWeapon?.subtypes.includes("2H") ||
+            selectedWeapon?.subtypes.includes(Subtype.TwoHanded) ||
             (selectedWeapon && selectedSecondWeapon)
         ) {
             setWeaponIsValid(true);
@@ -78,6 +75,8 @@ function App() {
         setDeckString(string);
     };
 
+    const pitchStrings = [null, "Red", "Yellow", "Blue"];
+
     const compileDeckString = (deck) => {
         if (!selectedHero || !selectedWeapon) return "";
 
@@ -96,7 +95,7 @@ function App() {
             string += `[${cards.length}] ${card.name}`;
 
             if (card.pitch != null) {
-                string += ` (${pitchStrings[card.pitch - 1]})`;
+                string += ` (${pitchStrings[card.pitch]})`;
             }
 
             string += "\n";
@@ -168,7 +167,7 @@ function App() {
                         Select second weapon
                     </option>
                     {weaponOptions
-                        .filter((weapon) => weapon.subtypes.includes("1H"))
+                        .filter((weapon) => weapon.subtypes.includes(Subtype.OneHanded))
                         .map((weapon) => (
                             <option key={weapon.name}>{weapon.name}</option>
                         ))}
