@@ -1,6 +1,6 @@
 {
   "name": "fab-sealed-generator",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@flesh-and-blood/cards": "^2.0.23",
