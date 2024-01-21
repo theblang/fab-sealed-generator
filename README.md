@@ -1,6 +1,6 @@
 # Try it [here](https://theblang.github.io/fab-sealed-generator)
 
-- Fill out the `Select hero` and `Select weapon` inputs to generate a random set of Sealed cards based on the `Assumptions`
+- Click `Generate` to generate a random set of Sealed cards based on the `Assumptions`
 - Click `Export` to automatically copy the card list and be navigated to FaBrary's import tool
 
 If you notice an issue, please submit [here](https://github.com/theblang/fab-sealed-generator/issues). For example, at one point I realized I hadn't filtered out the expansion slot cards from the main card pool.

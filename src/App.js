@@ -1,56 +1,30 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import "./App.css";
 import { cards } from "@flesh-and-blood/cards";
 import ExpansionSlotMap from "./ExpansionSlotMap";
-import { Rarity, Release, Subtype, Type } from "@flesh-and-blood/types";
+import { Rarity, Release, Type } from "@flesh-and-blood/types";
 
 function App() {
-    const heavyHitters = cards.filter(card => card.sets.includes(Release.HeavyHitters));
-    const heroes = heavyHitters.filter((card) => card.hero && card.young);
-    const weapons = heavyHitters.filter((card) => card.types.includes(Type.Weapon));
+    const heavyHitters = cards.filter(card => card.sets.includes(Release.HeavyHitters) && !ExpansionSlotMap[Release.HeavyHitters].includes(card.setIdentifiers[0]));
+    const heroes = heavyHitters.filter(card => card.hero && card.young);
+    const tokenWeapons = heavyHitters.filter(card => card.types.includes(Type.Weapon) && card.rarities.includes(Rarity.Token));
 
-    const mainPool = heavyHitters.filter((card) => !card.hero && !card.rarities.includes(Rarity.Token) && !ExpansionSlotMap[Release.HeavyHitters].includes(card.setIdentifiers[0]));
-    const majestics = mainPool.filter((card) => card.rarity === Rarity.Majestic);
-    const rares = mainPool.filter((card) => card.rarity === Rarity.Rare);
-    const commons = mainPool.filter((card) => card.rarity === Rarity.Common);
+    const mainPool = heavyHitters.filter(card => !card.hero && !card.rarities.includes(Rarity.Token));
+    const majestics = mainPool.filter(card => card.rarity === Rarity.Majestic);
+    const rares = mainPool.filter(card => card.rarity === Rarity.Rare);
+    const commons = mainPool.filter(card => card.rarity === Rarity.Common);
 
     const numRares = 11; // 12 rare/majestic slots, minus the 1 majestic assumption
     const numMajestics = 1; // 1 every 4 packs, so assume 1
     const numCommons = 72; // 11 commons + 1 common rainbow = 12 * 6 packs = 72
 
-    const [selectedHero, setSelectedHero] = useState(null);
-    const [selectedWeapon, setSelectedWeapon] = useState(null);
-    const [selectedSecondWeapon, setSelectedSecondWeapon] = useState(null);
-    const [weaponIsValid, setWeaponIsValid] = useState(false);
     const [deckString, setDeckString] = useState(null);
-    const [weaponOptions, setWeaponOptions] = useState([]);
 
-    useEffect(() => {
-        const options = weapons.filter((weapon) =>
-            intersects(weapon.classes, selectedHero?.classes),
-        );
-        setWeaponOptions(options);
-    }, [selectedHero]);
-
-    useEffect(() => {
-        if (
-            selectedWeapon?.subtypes.includes(Subtype.TwoHanded) ||
-            (selectedWeapon && selectedSecondWeapon)
-        ) {
-            setWeaponIsValid(true);
-            generate();
-        }
-    }, [selectedWeapon, selectedSecondWeapon]);
-
-    const changeHero = (event) => {
-        setSelectedHero(
-            heroes.find((hero) => hero.name === event.target.value),
-        );
-        setSelectedWeapon(null);
-        setSelectedSecondWeapon(null);
-        setDeckString(null);
-        setWeaponOptions([]);
+    const getRandomCard = (cards) => {
+        return cards[Math.floor(Math.random() * cards.length)];
     };
+
+    const pitchStrings = [null, "Red", "Yellow", "Blue"];
 
     // https://stackoverflow.com/a/34890276/1747491
     const groupBy = function (xs, key) {
@@ -60,11 +34,7 @@ function App() {
         }, {});
     };
 
-    const getRandomCard = (cards) => {
-        return cards[Math.floor(Math.random() * cards.length)];
-    };
-
-    const generate = () => {
+    const generateDeckString = () => {
         const deck = [];
         for (let i = 0; i < numRares; i++) deck.push(getRandomCard(rares));
         for (let i = 0; i < numMajestics; i++)
@@ -75,22 +45,14 @@ function App() {
         setDeckString(string);
     };
 
-    const pitchStrings = [null, "Red", "Yellow", "Blue"];
-
     const compileDeckString = (deck) => {
-        if (!selectedHero || !selectedWeapon) return "";
-
-        let selectedWeapons = [selectedWeapon, selectedSecondWeapon].filter(
-            Boolean,
-        );
-
         let string = "Deck build - via https://fabdb.net :\n\n";
-        string += `New deck (${selectedHero.name})\n\n`;
-        string += `Weapons: ${selectedWeapons.map((weapon) => weapon.name).join(", ")}\n\n`;
+        string += `New deck (${heroes[0].name})\n\n`;
+        string += `Weapons: ${tokenWeapons.map((weapon) => weapon.name).join(", ")}\n\n`;
 
         const groupedDeck = groupBy(deck, "cardIdentifier");
 
-        for (const [cardIdentifier, cards] of Object.entries(groupedDeck)) {
+        for (const [_cardIdentifier, cards] of Object.entries(groupedDeck)) {
             const card = cards[0];
             string += `[${cards.length}] ${card.name}`;
 
@@ -104,7 +66,7 @@ function App() {
         return string;
     };
 
-    const copyDeck = () => {
+    const exportDeckString = () => {
         const deck = document.getElementById("deck");
         deck.select();
         deck.setSelectionRange(0, 99999);
@@ -112,12 +74,9 @@ function App() {
         window.location.href = "https://fabrary.net/decks?tab=import";
     };
 
-    const intersects = (array1, array2) => {
-        return array1.some((item) => array2?.includes(item));
-    };
-
     return (
         <div className="App">
+            <div id="version">v1.0.0</div>
             <div id="assumptions">
                 <span>
                     <b>Assumptions</b>
@@ -126,58 +85,14 @@ function App() {
                     <li>6 packs of 16</li>
                     <li>Minus the two token/expansion slots</li>
                     <li>1 majestic</li>
-                    <li>All commons in rainbow slot</li>
+                    <li>Only commons in rainbow slot</li>
+                    <li>All token weapons included</li>
                 </ul>
             </div>
-            <select onChange={(event) => changeHero(event)}>
-                <option disabled selected value>
-                    Select hero
-                </option>
-                {heroes.map((hero) => (
-                    <option key={hero.name}>{hero.name}</option>
-                ))}
-            </select>
-            <select
-                onChange={(event) =>
-                    setSelectedWeapon(
-                        weapons.find(
-                            (weapon) => weapon.name === event.target.value,
-                        ),
-                    )
-                }
-            >
-                <option disabled selected value>
-                    Select weapon
-                </option>
-                {weaponOptions.map((weapon) => (
-                    <option key={weapon.name}>{weapon.name}</option>
-                ))}
-            </select>
-            {selectedWeapon?.subtypes.includes("1H") && (
-                <select
-                    onChange={(event) =>
-                        setSelectedSecondWeapon(
-                            weapons.find(
-                                (weapon) => weapon.name === event.target.value,
-                            ),
-                        )
-                    }
-                >
-                    <option disabled selected value>
-                        Select second weapon
-                    </option>
-                    {weaponOptions
-                        .filter((weapon) => weapon.subtypes.includes(Subtype.OneHanded))
-                        .map((weapon) => (
-                            <option key={weapon.name}>{weapon.name}</option>
-                        ))}
-                </select>
-            )}
-            <button onClick={copyDeck}>Export</button>
-            <br />
+            <button onClick={generateDeckString}>Generate</button>
+            <button onClick={exportDeckString}>Export</button>
+            <div><b>Note:</b> Kayo is selected by default to let FaBrary know the format, you can easily change your hero later</div>
             <textarea id="deck" value={deckString} readOnly />
-            <br />
-            <button onClick={generate} disabled={!weaponIsValid}>Regenerate</button>
         </div>
     );
 }

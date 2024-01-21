@@ -2,8 +2,13 @@
     text-align: center;
     padding: 20px;
 
+    div#version,
     div#assumptions {
         text-align: left;
+    }
+
+    div#version {
+        margin-bottom: 20px;
     }
 
     textarea#deck {
@@ -12,7 +17,7 @@
         margin: 20px 0 20px 0;
     }
 
-    select:last-of-type {
-        margin-right: 20px;
+    button {
+        margin: 10px;
     }
 }
