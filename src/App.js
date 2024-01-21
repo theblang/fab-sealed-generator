@@ -76,7 +76,7 @@ function App() {
 
     return (
         <div className="App">
-            <div id="version">v1.0.0</div>
+            <div id="version">v1.0.1</div>
             <div id="assumptions">
                 <span>
                     <b>Assumptions</b>
