@@ -1,98 +1,102 @@
-import { useState } from "react";
-import "./App.css";
-import { cards } from "@flesh-and-blood/cards";
-import ExpansionSlotMap from "./ExpansionSlotMap";
-import { Rarity, Release, Type } from "@flesh-and-blood/types";
+import './App.css';
+import githubMark from './github-mark.svg';
+import { cards } from '@flesh-and-blood/cards';
+import ExpansionSlotMap from './ExpansionSlotMap';
+import { Class, Rarity, Release, Type } from '@flesh-and-blood/types';
 
 function App() {
-    const heavyHitters = cards.filter(card => card.sets.includes(Release.HeavyHitters) && !ExpansionSlotMap[Release.HeavyHitters].includes(card.setIdentifiers[0]));
-    const heroes = heavyHitters.filter(card => card.hero && card.young);
-    const tokenWeapons = heavyHitters.filter(card => card.types.includes(Type.Weapon) && card.rarities.includes(Rarity.Token));
+    const heavyHitters = cards.filter(
+        card =>
+            card.sets.includes(Release.HeavyHitters) &&
+            !ExpansionSlotMap[Release.HeavyHitters].includes(card.setIdentifiers[0]),
+    );
+    const tokenWeapons = heavyHitters.filter(
+        card => card.types.includes(Type.Weapon) && card.rarities.includes(Rarity.Token),
+    );
 
     const mainPool = heavyHitters.filter(card => !card.hero && !card.rarities.includes(Rarity.Token));
-    const majestics = mainPool.filter(card => card.rarity === Rarity.Majestic);
+
     const rares = mainPool.filter(card => card.rarity === Rarity.Rare);
     const commons = mainPool.filter(card => card.rarity === Rarity.Common);
 
-    const numRares = 11; // 12 rare/majestic slots, minus the 1 majestic assumption
-    const numMajestics = 1; // 1 every 4 packs, so assume 1
-    const numCommons = 72; // 11 commons + 1 common rainbow = 12 * 6 packs = 72
+    const commonsClass = commons.filter(
+        card => card.classes[0] !== Class.Generic && !card.types.includes(Type.Equipment),
+    );
+    const commonsGenericAndEquipment = commons.filter(
+        card => card.classes[0] === Class.Generic || card.types.includes(Type.Equipment),
+    );
 
-    const [deckString, setDeckString] = useState(null);
+    const commonsSingleClass = commonsClass.filter(card => card.classes.length === 1);
+    const commonsWedge = commonsClass.filter(card => card.classes.length === 2);
 
-    const getRandomCard = (cards) => {
-        return cards[Math.floor(Math.random() * cards.length)];
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random#getting_a_random_integer_between_two_values
+    const getRandomCard = cards => {
+        const min = 0;
+        const max = cards.length;
+        const minCeiled = Math.ceil(min);
+        const maxFloored = Math.floor(max);
+        const randInt = Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled); // The maximum is exclusive and the minimum is inclusive
+
+        return cards[randInt];
     };
 
-    const pitchStrings = [null, "Red", "Yellow", "Blue"];
-
-    // https://stackoverflow.com/a/34890276/1747491
-    const groupBy = function (xs, key) {
-        return xs.reduce(function (rv, x) {
-            (rv[x[key]] = rv[x[key]] || []).push(x);
-            return rv;
-        }, {});
-    };
-
-    const generateDeckString = () => {
+    const generate = () => {
         const deck = [];
-        for (let i = 0; i < numRares; i++) deck.push(getRandomCard(rares));
-        for (let i = 0; i < numMajestics; i++)
-            deck.push(getRandomCard(majestics));
-        for (let i = 0; i < numCommons; i++) deck.push(getRandomCard(commons));
+        const numPacks = 6;
 
-        const string = compileDeckString(deck);
-        setDeckString(string);
-    };
-
-    const compileDeckString = (deck) => {
-        let string = "Deck build - via https://fabdb.net :\n\n";
-        string += `New deck (${heroes[0].name})\n\n`;
-        string += `Weapons: ${tokenWeapons.map((weapon) => weapon.name).join(", ")}\n\n`;
-
-        const groupedDeck = groupBy(deck, "cardIdentifier");
-
-        for (const [_cardIdentifier, cards] of Object.entries(groupedDeck)) {
-            const card = cards[0];
-            string += `[${cards.length}] ${card.name}`;
-
-            if (card.pitch != null) {
-                string += ` (${pitchStrings[card.pitch]})`;
-            }
-
-            string += "\n";
+        for (let i = 0; i < numPacks; i++) {
+            for (let j = 0; j < 5; j++) deck.push(getRandomCard(commonsSingleClass));
+            for (let j = 0; j < 3; j++) deck.push(getRandomCard(commonsWedge));
+            for (let j = 0; j < 3; j++) deck.push(getRandomCard(commonsGenericAndEquipment));
+            for (let j = 0; j < 2; j++) deck.push(getRandomCard(rares));
+            deck.push(getRandomCard(commons));
         }
 
-        return string;
-    };
+        const params = new URLSearchParams();
+        params.append('tab', 'import');
+        params.append('format', 'Sealed');
+        params.append('cards', 'HVY002'); // Kayo
+        deck.forEach(card => {
+            params.append('cards', card.setIdentifiers[0]);
+        });
+        tokenWeapons.forEach(card => {
+            params.append('cards', card.setIdentifiers[0]);
+            params.append('cards', card.setIdentifiers[0]);
+        });
 
-    const exportDeckString = () => {
-        const deck = document.getElementById("deck");
-        deck.select();
-        deck.setSelectionRange(0, 99999);
-        document.execCommand("copy");
-        window.location.href = "https://fabrary.net/decks?tab=import";
+        window.open(`https://fabrary.net/decks?${params.toString()}`, '_blank');
     };
 
     return (
         <div className="App">
-            <div id="version">v1.0.1</div>
+            <div id="version">
+                <span>v HVY.2</span>
+                <a id="fork-me" href="https://github.com/theblang/fab-sealed-generator">
+                    <img src={githubMark} />
+                </a>
+            </div>
             <div id="assumptions">
-                <span>
+                <div>
                     <b>Assumptions</b>
-                </span>
+                </div>
                 <ul>
-                    <li>6 packs of 16</li>
-                    <li>Minus the two token/expansion slots</li>
-                    <li>1 majestic</li>
-                    <li>Only commons in rainbow slot</li>
-                    <li>All token weapons included</li>
+                    <li>5 single-class slots</li>
+                    <li>3 wedge slots</li>
+                    <li>3 generic/equipment slots</li>
+                    <li>2 rare/majestic slots</li>
+                    <ul>
+                        <li>assume only rares</li>
+                    </ul>
+                    <li>1 rainbow slot</li>
+                    <ul>
+                        <li>assume only commons</li>
+                    </ul>
+                    <li>
+                        <del>2 token/expansion slots</del>
+                    </li>
                 </ul>
             </div>
-            <button onClick={generateDeckString}>Generate</button>
-            <button onClick={exportDeckString}>Export</button>
-            <div><b>Note:</b> Kayo is selected by default to let FaBrary know the format, you can easily change your hero later</div>
-            <textarea id="deck" value={deckString} readOnly />
+            <button onClick={generate}>Generate</button>
         </div>
     );
 }

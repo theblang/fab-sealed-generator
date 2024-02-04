@@ -1,23 +1,18 @@
 .App {
-    text-align: center;
     padding: 20px;
 
-    div#version,
-    div#assumptions {
-        text-align: left;
-    }
-
-    div#version {
+    div#version, div#assumptions {
         margin-bottom: 20px;
+
+        span {
+            margin-right: 20px;
+        }
     }
 
-    textarea#deck {
-        width: 500px;
-        height: 500px;
-        margin: 20px 0 20px 0;
-    }
-
-    button {
-        margin: 10px;
+    a#fork-me {
+        img {
+            width: 50px;
+            height: 50px;
+        }
     }
 }
