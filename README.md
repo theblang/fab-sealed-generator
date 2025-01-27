@@ -10,6 +10,10 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Changelog
 
+**HNT.1**
+
+Initial implementation
+
 **HVY.2**
 
 -   Fix **significant** bug where all common slots are the same, pulling from the entire pool. In reality: five are single-class, 3 are wedge, and 3 are generic/equipment.

@@ -1,6 +1,6 @@
 {
   "name": "fab-sealed-generator",
-  "version": "HVY.2",
+  "version": "HNT.1",
   "private": true,
   "dependencies": {
     "@flesh-and-blood/cards": "^3.4.53",
