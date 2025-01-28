@@ -2,6 +2,8 @@ import githubMark from './github-mark.svg';
 import { cards } from '@flesh-and-blood/cards';
 import { Class, Rarity, Release, Talent, Type } from '@flesh-and-blood/types';
 import getRandomCard from './getRandomCard';
+import { useState } from 'react';
+import './HNT.css';
 
 const sealedLegal = cards.filter(
     c =>
@@ -13,6 +15,7 @@ const sealedLegal = cards.filter(
 
 const common = sealedLegal.filter(c => c.rarity === Rarity.Common);
 const rare = sealedLegal.filter(c => c.rarity === Rarity.Rare);
+const majestic = sealedLegal.filter(c => c.rarity === Rarity.Majestic);
 const commonRare = common.concat(rare);
 
 const commonNoEquipment = common.filter(c => !c.types.includes(Type.Equipment));
@@ -54,7 +57,7 @@ const hybridDraconicGeneric = assassinNinja.concat(assassinWarrior).concat(draco
 });
 
 // See https://www.youtube.com/watch?v=HCKLBXimmfY&t=28s
-const generate = () => {
+const generate = majesticCount => {
     let deck = [];
     const numPacks = 8;
 
@@ -74,7 +77,13 @@ const generate = () => {
         deck.push(getRandomCard(commonEquipment));
 
         deck.push(getRandomCard(rare));
-        deck.push(getRandomCard(rare));
+
+        if (i < majesticCount) {
+            deck.push(getRandomCard(majestic));
+        } else {
+            deck.push(getRandomCard(rare));
+        }
+
         deck.push(getRandomCard(commonRare));
     }
 
@@ -105,6 +114,18 @@ const generate = () => {
 };
 
 export default function HNT() {
+    const [majesticCount, setMajesticCount] = useState(0);
+
+    const handleMajesticCountChange = event => {
+        let count = parseInt(event.target.value, 10) || 0;
+        if (count > 8) count = 8;
+        setMajesticCount(count); // Parse to integer, default to 0 if invalid
+    };
+
+    const runGenerate = () => {
+        generate(majesticCount);
+    };
+
     return (
         <>
             <div id="version">
@@ -129,17 +150,22 @@ export default function HNT() {
                     <li>1 Common Equipment</li>
                     <li>1 Rare slot</li>
                     <li>1 Rare / Majestic slot</li>
-                    <ul>
-                        <li>For simplicity, assume only Rare</li>
-                    </ul>
                     <li>1 Rainbow Foil slot</li>
-                    <ul>
-                        <li>For simplicity, assume only Common / Rare</li>
-                    </ul>
                     <li>Prerelease pack with all tokens and one (of three) additional Rainbow Foil weapon</li>
                 </ul>
             </div>
-            <button onClick={generate}>Generate</button>
+            <label htmlFor="majesticCount">Majestic count:</label>
+            <input
+                type="number"
+                id="majesticCount"
+                value={majesticCount}
+                max="8"
+                onChange={handleMajesticCountChange}
+            />
+            <br />
+            <button type="button" onClick={runGenerate}>
+                Generate
+            </button>
         </>
     );
 }

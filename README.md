@@ -10,6 +10,10 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Changelog
 
+**HNT.2**
+
+Added Majestic option
+
 **HNT.1**
 
 Initial implementation
