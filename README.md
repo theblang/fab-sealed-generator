@@ -12,7 +12,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 **HNT.2**
 
-Added Majestic option
+Add Majestic option
 
 **HNT.1**
 
