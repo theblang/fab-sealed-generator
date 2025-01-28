@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/fab-sealed-generator/static/css/main.bb7c3285.css",
-    "main.js": "/fab-sealed-generator/static/js/main.8021bd0b.js",
+    "main.css": "/fab-sealed-generator/static/css/main.ef19025d.css",
+    "main.js": "/fab-sealed-generator/static/js/main.4beb7b88.js",
     "static/js/787.1b9532dd.chunk.js": "/fab-sealed-generator/static/js/787.1b9532dd.chunk.js",
     "static/media/github-mark.svg": "/fab-sealed-generator/static/media/github-mark.6fa18895f6e6c7772cab7049f7e05f59.svg",
     "index.html": "/fab-sealed-generator/index.html",
-    "main.bb7c3285.css.map": "/fab-sealed-generator/static/css/main.bb7c3285.css.map",
-    "main.8021bd0b.js.map": "/fab-sealed-generator/static/js/main.8021bd0b.js.map",
+    "main.ef19025d.css.map": "/fab-sealed-generator/static/css/main.ef19025d.css.map",
+    "main.4beb7b88.js.map": "/fab-sealed-generator/static/js/main.4beb7b88.js.map",
     "787.1b9532dd.chunk.js.map": "/fab-sealed-generator/static/js/787.1b9532dd.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.bb7c3285.css",
-    "static/js/main.8021bd0b.js"
+    "static/css/main.ef19025d.css",
+    "static/js/main.4beb7b88.js"
   ]
 }
