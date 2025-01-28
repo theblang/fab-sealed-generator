@@ -129,7 +129,7 @@ export default function HNT() {
     return (
         <>
             <div id="version">
-                <span>v HNT.1</span>
+                <span>v HNT.2</span>
                 <a id="fork-me" href="https://github.com/theblang/fab-sealed-generator">
                     <img src={githubMark} />
                 </a>
