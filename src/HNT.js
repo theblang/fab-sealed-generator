@@ -163,6 +163,7 @@ export default function HNT() {
                 max="8"
                 onChange={handleMajesticCountChange}
             />
+            {majesticCount > 3 && <span>You wish :D</span>}
             <br />
             <button type="button" onClick={runGenerate}>
                 Generate
