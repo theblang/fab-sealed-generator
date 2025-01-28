@@ -159,6 +159,7 @@ export default function HNT() {
                 type="number"
                 id="majesticCount"
                 value={majesticCount}
+                min="0"
                 max="8"
                 onChange={handleMajesticCountChange}
             />
